@@ -10,12 +10,11 @@ interface Data {
   [key: string]: any;
 }
 
-type DoneCallback = (_: any) => void;
-// type Handler = (payload: Data, cb: DoneCallback) => void
 type Handler = (payload: Data) => void;
 
 const tasks: Map<string, Task[]> = new Map<string, Task[]>();
 const handlers: Map<string, Handler> = new Map<string, Handler>();
+const results: Map<string, any> = new Map<string, any>();
 
 export function cancel(taskId: string) {
   tasks.delete(taskId);
@@ -26,7 +25,7 @@ export function create(name: string, data: Data): Promise<string> | string {
   setTimeout(() => {
     if (handlers.has(name)) {
       // @ts-ignore
-      taskRunner(name, handlers.get(name));
+      _taskRunner(name, handlers.get(name));
     }
   }, 0)
   return task.id;
@@ -51,16 +50,16 @@ function _addOrCreateTaskArray(name: string, data: Data): Task {
   return t;
 }
 
-export function handle(name: string): { with: (_: Handler) => void } {
+export function handle(name: string): { with: (data: Handler) => Promise<any> | void } {
   return {
-    with: function (handlerFunc: Handler): void {
-      taskRunner(name, handlerFunc);
+    with: function (handlerFunc: Handler): Promise<any> | void {
+      _taskRunner(name, handlerFunc);
       handlers.set(name, handlerFunc);
     },
   };
 }
 
-function taskRunner(name: string, handlerFunc: Handler) {
+function _taskRunner(name: string, handlerFunc: Handler) {
   if (tasks.has(name)) {
     const taskArr = tasks.get(name);
     // @ts-ignore
