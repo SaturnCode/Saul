@@ -1,7 +1,7 @@
 import { assert } from "https://deno.land/std@0.74.0/testing/asserts.ts";
 import { create, handle } from "./task.ts";
 
-function delay(ms: number) {
+function delay(ms: number): Promise<void> {
   return new Promise((res) => setTimeout(res, ms));
 }
 
