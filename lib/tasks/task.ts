@@ -1,6 +1,6 @@
 import { v4 } from "https://deno.land/std/uuid/mod.ts";
 
-type Task = {
+export type Task = {
   id: string;
   name: string;
   data: string;
