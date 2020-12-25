@@ -44,10 +44,7 @@ function _addOrCreateTaskArray(name: string, data: Data): Task {
   return t;
 }
 
-export function handle(
-  name: string,
-  handlerFunc?: Handler,
-): { with: (_: Handler) => void } {
+export function handle(name: string): { with: (_: Handler) => void } {
   return {
     with: function (handlerFunc: Handler): void {
       let current: Task;
