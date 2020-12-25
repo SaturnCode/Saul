@@ -14,14 +14,21 @@ type DoneCallback = (_: any) => void;
 // type Handler = (payload: Data, cb: DoneCallback) => void
 type Handler = (payload: Data) => void;
 
-const state: Map<string, Task[]> = new Map<string, Task[]>();
+const tasks: Map<string, Task[]> = new Map<string, Task[]>();
+const handlers: Map<string, Handler> = new Map<string, Handler>();
 
 export function cancel(taskId: string) {
-  state.delete(taskId);
+  tasks.delete(taskId);
 }
 
 export function create(name: string, data: Data): Promise<string> | string {
   const task = _addOrCreateTaskArray(name, data);
+  setTimeout(() => {
+    if (handlers.has(name)) {
+      // @ts-ignore
+      taskRunner(name, handlers.get(name));
+    }
+  }, 0)
   return task.id;
 }
 
@@ -32,13 +39,13 @@ function _addOrCreateTaskArray(name: string, data: Data): Task {
     name,
     id: taskId,
   };
-  if (state.has(name)) {
+  if (tasks.has(name)) {
     // @ts-ignore
-    state.get(name).push(t);
+    tasks.get(name).push(t);
   } else {
-    state.set(name, new Array<Task>());
+    tasks.set(name, new Array<Task>());
     // @ts-ignore
-    state.get(name).push(t);
+    tasks.get(name).push(t);
   }
 
   return t;
@@ -47,21 +54,19 @@ function _addOrCreateTaskArray(name: string, data: Data): Task {
 export function handle(name: string): { with: (_: Handler) => void } {
   return {
     with: function (handlerFunc: Handler): void {
-      let current: Task;
-      if (state.has(name)) {
-        const taskArr = state.get(name);
-        // @ts-ignore
-        taskArr.forEach(t => {
-          const data = JSON.parse(t.data);
-          handlerFunc(data);
-        })
-        // for (let i = 0; i < taskArr.length; i++) {
-        //   // @ts-ignore
-        //   current = taskArr[i];
-        //   const data = JSON.parse(current.data);
-        //   handlerFunc(data);
-        // }
-      }
+      taskRunner(name, handlerFunc);
+      handlers.set(name, handlerFunc);
     },
   };
+}
+
+function taskRunner(name: string, handlerFunc: Handler) {
+  if (tasks.has(name)) {
+    const taskArr = tasks.get(name);
+    // @ts-ignore
+    taskArr.forEach(t => {
+      const data = JSON.parse(t.data);
+      handlerFunc(data);
+    })
+  }
 }

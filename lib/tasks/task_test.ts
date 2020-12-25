@@ -1,4 +1,4 @@
-import { assert } from "https://deno.land/std@0.74.0/testing/asserts.ts";
+import { assert, assertEquals } from "https://deno.land/std@0.74.0/testing/asserts.ts";
 import { create, handle } from "./task.ts";
 
 function delay(ms: number): Promise<void> {
@@ -33,8 +33,35 @@ Deno.test("It should run tasks", async () => {
 
   await delay(100);
   // @ts-ignore
-  assert(res[0] === 11);
+  assertEquals(res[0], 11, "First value should be 11");
 
   // @ts-ignore
-  assert(res[1] === 12);
+  assertEquals(res[1], 12, "Second value should be 12");
+});
+
+
+Deno.test("It should run after handle is called", async () => {
+  const res: number[] = [];
+
+  handle("one")
+      .with(async (data) => {
+        await delay(1);
+        res.push(Number(data.val) + 10);
+      });
+
+  await create("one", {
+    val: 1,
+  });
+
+  await create("one", {
+    val: 2,
+  });
+
+
+  await delay(100);
+  // @ts-ignore
+  assertEquals(res[0], 11, "First value should be 11");
+
+  // @ts-ignore
+  assertEquals(res[1], 12, "Second value should be 12");
 });
