@@ -51,12 +51,16 @@ export function handle(name: string): { with: (_: Handler) => void } {
       if (state.has(name)) {
         const taskArr = state.get(name);
         // @ts-ignore
-        for (let i = 0; i < taskArr.length; i++) {
-          // @ts-ignore
-          current = taskArr[i];
-          const data = JSON.parse(current.data);
+        taskArr.forEach(t => {
+          const data = JSON.parse(t.data);
           handlerFunc(data);
-        }
+        })
+        // for (let i = 0; i < taskArr.length; i++) {
+        //   // @ts-ignore
+        //   current = taskArr[i];
+        //   const data = JSON.parse(current.data);
+        //   handlerFunc(data);
+        // }
       }
     },
   };
