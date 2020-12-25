@@ -9,6 +9,7 @@ type Task = {
 interface Data {
   [key: string]: any;
 }
+
 type DoneCallback = (_: any) => void;
 // type Handler = (payload: Data, cb: DoneCallback) => void
 type Handler = (payload: Data) => void;
@@ -45,17 +46,21 @@ function _addOrCreateTaskArray(name: string, data: Data): Task {
 
 export function handle(
   name: string,
-  handlerFunc: Handler,
-): Promise<any> | void {
-  let current: Task;
-  if (state.has(name)) {
-    const taskArr = state.get(name)
-    // @ts-ignore
-    for (let i = 0; i < taskArr.length; i++) {
-      // @ts-ignore
-      current = taskArr[i];
-      const data = JSON.parse(current.data);
-      handlerFunc(data);
-    }
-  }
+  handlerFunc?: Handler,
+): { with: (_: Handler) => void } {
+  return {
+    with: function (handlerFunc: Handler): void {
+      let current: Task;
+      if (state.has(name)) {
+        const taskArr = state.get(name);
+        // @ts-ignore
+        for (let i = 0; i < taskArr.length; i++) {
+          // @ts-ignore
+          current = taskArr[i];
+          const data = JSON.parse(current.data);
+          handlerFunc(data);
+        }
+      }
+    },
+  };
 }

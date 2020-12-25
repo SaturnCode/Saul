@@ -25,13 +25,13 @@ Deno.test("It should run tasks", async () => {
     val: 2,
   });
 
+  handle("doStuff")
+    .with(async (data) => {
+      await delay(1);
+      res.push(Number(data.val) + 10);
+    });
 
-  handle("doStuff", async (data) => {
-    await delay(1);
-    res.push(Number(data.val) + 10)
-  });
-
-  await delay(100)
+  await delay(100);
   // @ts-ignore
   assert(res[0] === 11);
 
