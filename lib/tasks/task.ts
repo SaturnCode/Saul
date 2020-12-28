@@ -1,6 +1,6 @@
 import { v4 } from "https://deno.land/std/uuid/mod.ts";
 
-type Task = {
+export type Task = {
   id: string;
   name: string;
   data: string;
@@ -14,7 +14,6 @@ type Handler = (payload: Data) => void;
 
 const tasks: Map<string, Task[]> = new Map<string, Task[]>();
 const handlers: Map<string, Handler> = new Map<string, Handler>();
-const results: Map<string, any> = new Map<string, any>();
 
 export function cancel(taskId: string) {
   tasks.delete(taskId);
