@@ -14,7 +14,6 @@ type Handler = (payload: Data) => void;
 
 const tasks: Map<string, Task[]> = new Map<string, Task[]>();
 const handlers: Map<string, Handler> = new Map<string, Handler>();
-const results: Map<string, any> = new Map<string, any>();
 
 export function cancel(taskId: string) {
   tasks.delete(taskId);

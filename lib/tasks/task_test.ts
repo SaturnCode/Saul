@@ -2,7 +2,7 @@ import { assert, assertEquals } from "https://deno.land/std@0.74.0/testing/asser
 import { create, handle } from "./task.ts";
 
 function delay(ms: number): Promise<void> {
-  return new Promise((res) => setTimeout(res, ms));
+  return new Promise((res:()=>any) => setTimeout(res, ms));
 }
 
 Deno.test("It should add tasks", async () => {
